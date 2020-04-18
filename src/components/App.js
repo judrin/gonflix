@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
+import Router from './Router';
+import GlobalStyles from './GlobalStyles';
 
-function App() {
-  return (
-    <div className="App">
-    </div>
-  );
+class App extends Component {
+  render() {
+    return (
+      <React.Fragment>
+        <GlobalStyles />
+        <Router />
+      </React.Fragment>
+    )
+  }
 }
 
 export default App;
