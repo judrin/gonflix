@@ -1,16 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://api.themoviedb.org/3/'
-})
-
-api.interceptors.request.use(config => {
-  config.params = {
+  baseURL: 'https://api.themoviedb.org/3/',
+  params: {
     api_key: 'f03bf81eb6a19eb77e17dc2e902e9c75'
   }
-
-  return config;
-});
+})
 
 export const movieApi = {
   nowPlaying: () => api.get('movie/now_playing'),
