@@ -10,10 +10,10 @@ export default function Router() {
     <BrowserRouter>
       <Header />
       <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/tv" component={TV} />
-          <Route path="/search" component={Search} />
-          <Redirect from="*" to="/" />
+        <Route path="/" exact component={Home} />
+        <Route path="/tv" component={TV} />
+        <Route path="/search" component={Search} />
+        <Redirect from="*" to="/" />
       </Switch>
     </BrowserRouter>
   )
