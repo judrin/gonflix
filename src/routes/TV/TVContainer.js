@@ -17,11 +17,11 @@ class TVContainer extends Component {
       tvApi.popular(),
       tvApi.airingToday()
     ])
-      .then(([topRated, popular, airingToday]) => {
+      .then(([topRatedResponse, popularResponse, airingTodayResponse]) => {
         this.setState({
-          topRated,
-          popular,
-          airingToday,
+          topRated: topRatedResponse.data.results,
+          popular: popularResponse.data.results,
+          airingToday: airingTodayResponse.data.results,
           loading: false
         })
       })
@@ -34,12 +34,12 @@ class TVContainer extends Component {
   }
 
   render() {
-    const { topRated, popular, airngToday, loading, error } = this.state;
+    const { topRated, popular, airingToday, loading, error } = this.state;
     return (
       <TVPresenter
         topRated={topRated}
         popular={popular}
-        airngToday={airngToday}
+        airingToday={airingToday}
         loading={loading}
         error={error}
       />

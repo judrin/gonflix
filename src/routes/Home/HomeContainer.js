@@ -17,11 +17,11 @@ class HomeContainer extends Component {
       movieApi.upcoming(),
       movieApi.popular()
     ])
-      .then(([nowPlaying, upcoming, popular]) => {
+      .then(([nowPlayingResponse, upcomingResponse, popularResponse]) => {
         this.setState({
-          nowPlaying,
-          upcoming,
-          popular,
+          nowPlaying: nowPlayingResponse.data.results,
+          upcoming: upcomingResponse.data.results,
+          popular: popularResponse.data.results,
           loading: false
         })
       })
