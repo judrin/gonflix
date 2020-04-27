@@ -37,8 +37,6 @@ class SearchContainer extends Component {
       loading: true,
     });
 
-    console.log("searching");
-
     Promise.all([movieApi.search(searchTerm), tvApi.search(searchTerm)])
       .then(([movieResultsResponse, tvResultsResponse]) => {
         this.setState({

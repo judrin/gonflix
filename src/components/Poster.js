@@ -46,11 +46,13 @@ const Year = styled.span`
 `;
 
 function Poster({ id, imgUrl, title, rating, year, isMovie = false }) {
+  const bgUrl = imgUrl ? `https://image.tmdb.org/t/p/w300${imgUrl}` : require('../assets/not-available.png');
+
   return (
     <Link to={isMovie ? `/movie/${id}` : `/show/${id}`}>
       <Container>
         <ImageContainer>
-          <Image bgUrl={imgUrl ? `https://image.tmdb.org/t/p/w300${imgUrl}` : require('../assets/not-available.png')} />
+          <Image bgUrl={bgUrl} />
           <Rating>
             <span role="img" aria-label="rating">
               ⭐
@@ -58,7 +60,9 @@ function Poster({ id, imgUrl, title, rating, year, isMovie = false }) {
             {rating}/10
         </Rating>
         </ImageContainer>
-        <Title>{title.length > 18 ? `${title.substring(0, 18)}...` : title}</Title>
+        <Title>
+          {title.length > 18 ? `${title.substring(0, 18)}...` : title}
+        </Title>
         <Year>{year}</Year>
       </Container>
     </Link>
