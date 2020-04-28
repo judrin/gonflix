@@ -63,13 +63,21 @@ const Overview = styled.p`
   width: 50%;
 `;
 
+const Icon = styled.img`
+  width: 40px;
+  vertical-align: middle;
+`
+
 function DetailPresenter({ result, loading, error }) {
-  let releaseDate = null;
-  let runtime = null;
+  const subDetails = [];
 
   if (!loading) {
-    releaseDate = result.release_date || result.first_air_date
-    runtime = result.runtime || result.episode_run_time[0];
+    const releaseDate = result.release_date || result.first_air_date
+    const runtime = result.runtime || result.episode_run_time[0];
+
+    if (releaseDate) subDetails.push(releaseDate.substring(0, 4));
+    if (runtime) subDetails.push(`${runtime} min`);
+    if (result.genres) subDetails.push(result.genres.map(genre => genre.name).join(' / '))
   }
 
   return (
@@ -93,24 +101,25 @@ function DetailPresenter({ result, loading, error }) {
                 {result.original_title || result.original_name}
               </Title>
               <ItemContainer>
-                {releaseDate ? (
+                {subDetails.reduce((acc, curr, index) => 
+                  [acc, <Divider key={`item-d-${index}`}>•</Divider>, <Item key={`detail-${index}`}>{curr}</Item>])
+                }
+                {result.imdb_id ? (
                   <>
-                    <Item>{releaseDate.substring(0, 4)}</Item>
                     <Divider>•</Divider>
+                    <Item>
+                      <a
+                        href={`https://www.imdb.com/title/${result.imdb_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <Icon
+                          src={require('../../assets/IMDb-logo.png')}
+                          alt="IMDb"
+                        />
+                      </a>
+                    </Item>
                   </>
                 ) : null}
-                {runtime ? (
-                  <>
-                    <Item>{runtime} min</Item>
-                    <Divider>•</Divider>
-                  </>
-                ) : null}
-                <Item>
-                  {result.genres && result.genres.map((genre, index) => index === result.genres.length - 1
-                    ? genre.name
-                    : `${genre.name} / `
-                  )}
-                </Item>
               </ItemContainer>
               <Overview>{result.overview}</Overview>
             </Data>
