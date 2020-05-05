@@ -5,6 +5,8 @@ import Loader from 'components/Loader';
 import HeadTitle from 'components/HeadTitle';
 import Message from 'components/Message';
 
+import { Scrollbars } from 'react-custom-scrollbars';
+
 const Container = styled.div`
   height: calc(100vh - 50px);
   width: 100%;
@@ -39,7 +41,7 @@ const Cover = styled.div`
 
 const Data = styled.div`
   width: 70%;
-  margin-left: 10px;
+  margin-left: 20px;
 `;
 
 const Title = styled.h3`
@@ -66,6 +68,49 @@ const Overview = styled.p`
 const Icon = styled.img`
   width: 40px;
   vertical-align: middle;
+`;
+
+const VideoContainer = styled.div`
+  margin-top: 30px;
+
+  h4 {
+    display: inline-block;
+    font-size: 22px;
+    border-bottom: 3px solid #3498db;
+    padding: 5px;
+  }
+`;
+
+const StyledScrollbars = styled(Scrollbars)`
+  margin-top: 20px;
+  
+  > div {
+    white-space: nowrap
+  }
+`
+
+const TrackHorizontalScrollbar = styled.div`
+  right: 2px;
+  bottom: 2px;
+  left: 2px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.58);
+`
+
+const ThumbHorizontalScrollbar = styled.div`
+  background-color: rgba(52, 152, 219, 0.74);
+  border: 1px solid #3498db;
+  border-radius: 3px;
+`
+
+const Video = styled.div`
+  width: 320px;
+  margin-left: 20px;
+  display: inline-block;
+
+  :first-child {
+    margin-left: 0;
+  }
 `
 
 function DetailPresenter({ result, loading, error }) {
@@ -122,6 +167,25 @@ function DetailPresenter({ result, loading, error }) {
                 ) : null}
               </ItemContainer>
               <Overview>{result.overview}</Overview>
+              <VideoContainer>
+                <h4>Trailer</h4>
+                <StyledScrollbars
+                  style={{ height: 195 }} 
+                  renderTrackHorizontal={({ style, ...props }) => <TrackHorizontalScrollbar style={style} {...props} />}
+                  renderThumbHorizontal={({ style, ...props }) => <ThumbHorizontalScrollbar style={style} {...props} />}
+                >
+                  {result.videos && result.videos.results.map(video => (
+                    <Video key={video.id}>
+                      <iframe 
+                        src={`https://www.youtube.com/embed/${video.key}`}
+                        width="100%"
+                        height="180px"
+                        title={video.name}
+                      />
+                    </Video>
+                  ))}
+                </StyledScrollbars>
+              </VideoContainer>
             </Data>
           </Content>
           {error && <Message text={error} color="#e74c3c" />}
