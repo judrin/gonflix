@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import Loader from 'components/Loader';
 import HeadTitle from 'components/HeadTitle';
 import Message from 'components/Message';
-
-import { Scrollbars } from 'react-custom-scrollbars';
+import HorizontalScrollbar from 'components/HorizontalScrollbar';
+import Season from 'components/Season';
 
 const Container = styled.div`
   height: calc(100vh - 50px);
@@ -30,18 +30,33 @@ const Content = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const Cover = styled.div`
   width: 30%; 
-  height: 100%;
+  height: 41vw;
   background: url(${props => props.bgImage}) center/cover no-repeat;
   border-radius: 5px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    height: 117vw;
+    margin-bottom: 25px;
+  }
 `;
 
 const Data = styled.div`
   width: 70%;
-  margin-left: 20px;
+  margin-left: 28px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    margin-left: 0;
+  }
 `;
 
 const Title = styled.h3`
@@ -62,7 +77,7 @@ const Overview = styled.p`
   font-size: 12px;
   opacity: 0.7;
   line-height: 1.5;
-  width: 50%;
+  max-width: 640px;
 `;
 
 const Icon = styled.img`
@@ -81,28 +96,6 @@ const VideoContainer = styled.div`
   }
 `;
 
-const StyledScrollbars = styled(Scrollbars)`
-  margin-top: 20px;
-  
-  > div {
-    white-space: nowrap
-  }
-`
-
-const TrackHorizontalScrollbar = styled.div`
-  right: 2px;
-  bottom: 2px;
-  left: 2px;
-  border-radius: 3px;
-  background-color: rgba(0, 0, 0, 0.58);
-`
-
-const ThumbHorizontalScrollbar = styled.div`
-  background-color: rgba(52, 152, 219, 0.74);
-  border: 1px solid #3498db;
-  border-radius: 3px;
-`
-
 const Video = styled.div`
   width: 320px;
   margin-left: 20px;
@@ -111,6 +104,18 @@ const Video = styled.div`
   :first-child {
     margin-left: 0;
   }
+
+  @media (max-width: 419px) {
+    width: 280px;
+
+    > iframe {
+      height: 158px;
+    }
+  }
+`
+
+const SeasonContainer = styled.div`
+  margin-top: 50px;
 `
 
 function DetailPresenter({ result, loading, error }) {
@@ -118,11 +123,11 @@ function DetailPresenter({ result, loading, error }) {
 
   if (!loading) {
     const releaseDate = result.release_date || result.first_air_date
-    const runtime = result.runtime || result.episode_run_time[0];
+    const runtime = result.runtime || (result.episode_run_time && result.episode_run_time[0]);
 
     if (releaseDate) subDetails.push(releaseDate.substring(0, 4));
     if (runtime) subDetails.push(`${runtime} min`);
-    if (result.genres) subDetails.push(result.genres.map(genre => genre.name).join(' / '))
+    if (result.genres && result.genres.length) subDetails.push(result.genres.map(genre => genre.name).join(' / '))
   }
 
   return (
@@ -169,14 +174,10 @@ function DetailPresenter({ result, loading, error }) {
               <Overview>{result.overview}</Overview>
               <VideoContainer>
                 <h4>Trailer</h4>
-                <StyledScrollbars
-                  style={{ height: 195 }} 
-                  renderTrackHorizontal={({ style, ...props }) => <TrackHorizontalScrollbar style={style} {...props} />}
-                  renderThumbHorizontal={({ style, ...props }) => <ThumbHorizontalScrollbar style={style} {...props} />}
-                >
+                <HorizontalScrollbar>
                   {result.videos && result.videos.results.map(video => (
                     <Video key={video.id}>
-                      <iframe 
+                      <iframe
                         src={`https://www.youtube.com/embed/${video.key}`}
                         width="100%"
                         height="180px"
@@ -184,8 +185,20 @@ function DetailPresenter({ result, loading, error }) {
                       />
                     </Video>
                   ))}
-                </StyledScrollbars>
+                </HorizontalScrollbar>
               </VideoContainer>
+              <SeasonContainer>
+                {result.seasons && result.seasons.map(season => (
+                  <Season
+                    key={season.id}
+                    imgUrl={season.poster_path}
+                    name={season.name}
+                    year={season.air_date && season.air_date.substring(0, 4)} 
+                    epCount={season.episode_count} 
+                    overview={season.overview}
+                  />
+                ))}
+              </SeasonContainer>
             </Data>
           </Content>
           {error && <Message text={error} color="#e74c3c" />}
@@ -195,7 +208,7 @@ function DetailPresenter({ result, loading, error }) {
   )
 }
 
-DetailPresenter.prototype = {
+DetailPresenter.propTypes = {
   result: PropTypes.object,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
