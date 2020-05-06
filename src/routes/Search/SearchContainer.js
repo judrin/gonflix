@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import debounce from 'lodash/debounce';
 import SearchPresenter from './SearchPresenter';
 import { movieApi, tvApi } from 'api';
 
@@ -6,23 +7,14 @@ class SearchContainer extends Component {
   state = {
     movieResults: null,
     tvResults: null,
-    searchTerm: '',
     loading: false,
     error: null
   };
 
-  componentDidMount() {
-    this.handleSubmit();
+  handleChange = (event) => {
+    const term = event.target.value;
+    this.debouncedSearchByTerm(term);
   }
-
-  handleSubmit = (event) => {
-    event && event.preventDefault();
-    const { searchTerm } = this.state;
-
-    if (searchTerm !== "") {
-      this.searchByTerm();
-    }
-  };
 
   updateTerm = (event) => {
     this.setState({
@@ -30,14 +22,23 @@ class SearchContainer extends Component {
     })
   }
 
-  searchByTerm = () => {
-    const { searchTerm } = this.state;
+  searchByTerm = (term) => {
+    if (!term) {
+      this.setState({
+        movieResults: null,
+        tvResults: null
+      });
+
+      return;
+    }
+
+    console.log(term);
 
     this.setState({
       loading: true,
     });
 
-    Promise.all([movieApi.search(searchTerm), tvApi.search(searchTerm)])
+    Promise.all([movieApi.search(term), tvApi.search(term)])
       .then(([movieResultsResponse, tvResultsResponse]) => {
         this.setState({
           movieResults: movieResultsResponse.data.results,
@@ -53,6 +54,8 @@ class SearchContainer extends Component {
       });
   };
 
+  debouncedSearchByTerm = debounce(this.searchByTerm, 250);
+
   render() {
     const { movieResults, tvResults, searchTerm, loading, error } = this.state;
     return (
@@ -62,8 +65,7 @@ class SearchContainer extends Component {
         searchTerm={searchTerm}
         loading={loading}
         error={error}
-        handleSubmit={this.handleSubmit}
-        updateTerm={this.updateTerm}
+        handleChange={this.handleChange}
       />
     );
   }

@@ -12,7 +12,7 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-const Form = styled.form`
+const Bar = styled.div`
   margin-bottom: 50px;
   width: 100%;
 `;
@@ -29,19 +29,18 @@ function SearchPresenter({
   searchTerm,
   loading,
   error,
-  handleSubmit,
-  updateTerm
+  handleChange
 }) {
   return (
     <Container>
       <HeadTitle title="Search" />
-      <Form onSubmit={handleSubmit}>
+      <Bar>
         <Input
           placeholder="Search Movies or TV Shows..."
           value={searchTerm}
-          onChange={updateTerm}
+          onChange={handleChange}
         />
-      </Form>
+      </Bar>
       {!loading ? (
         <>
           {movieResults && movieResults.length > 0 && (
