@@ -5,6 +5,7 @@ import Home from 'routes/Home';
 import TV from 'routes/TV';
 import Search from 'routes/Search';
 import Detail from 'routes/Detail';
+import Favorite from 'routes/Favorite';
 
 export default function Router() {
   return (
@@ -16,6 +17,7 @@ export default function Router() {
         <Route path="/search" component={Search} />
         <Route path="/movie/:id" component={Detail} />
         <Route path="/show/:id" component={Detail} />
+        <Route path="/favorites/" component={Favorite} />
         <Redirect from="*" to="/" />
       </Switch>
     </BrowserRouter>
