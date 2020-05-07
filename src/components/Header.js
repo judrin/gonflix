@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
+import { FaHeart } from  'react-icons/fa';
 
 const StyledHeader = styled.header`
   color: white;
@@ -18,6 +19,7 @@ const StyledHeader = styled.header`
 
 const List = styled.ul`
   display: flex;
+  width: 100%;
 `
 
 const Item = styled.li`
@@ -26,6 +28,12 @@ const Item = styled.li`
   text-align: center;
   border-bottom: 3px solid ${props => props.current ? '#3498db' : 'transparent'};
   transition: border-bottom .3s ease-in-out;
+`
+
+const FavoriteItem = styled(Item)`
+  margin-left: auto;
+  border-bottom: none;
+  font-size: 18px;
 `
 
 const StyledLink = styled(Link)`
@@ -48,6 +56,9 @@ function Header({ location: { pathname } }) {
         <Item current={pathname === '/search'}>
           <StyledLink to="/search">Search</StyledLink>
         </Item>
+        <FavoriteItem>
+          <StyledLink to="/favorites"><FaHeart /></StyledLink>
+        </FavoriteItem>
       </List>
     </StyledHeader>
   )

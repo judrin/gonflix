@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { FaHeart } from 'react-icons/fa';
 
 const Container = styled.div`
   font-size: 12px;
@@ -22,6 +23,20 @@ const Rating = styled.span`
   transition: opacity .15s linear;
 `;
 
+const Favorite = styled(FaHeart)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 18px;
+  opacity: ${props => props.isFavorite ? 1 : 0};
+  color: ${props => props.isFavorite ? '#3498db' : 'white'};
+  transition: opacity .15s linear, color .15s linear;
+
+  &:hover {
+    color: #3498db;
+  }
+`;
+
 const ImageContainer = styled.div`
   margin-bottom: 5px;
   position: relative;
@@ -29,6 +44,7 @@ const ImageContainer = styled.div`
     ${Image} {
       opacity: 0.3;
     }
+    ${Favorite},
     ${Rating} {
       opacity: 1;
     }
@@ -45,7 +61,7 @@ const Year = styled.span`
   color: rgba(255, 255, 255, 0.5);
 `;
 
-function Poster({ id, imgUrl, title, rating, year, isMovie = false }) {
+function Poster({ id, imgUrl, title, rating, year, isFavorite, handleFavoriteClick, isMovie = false }) {
   const bgUrl = imgUrl ? `https://image.tmdb.org/t/p/w300${imgUrl}` : require('../assets/not-available.png');
 
   return (
@@ -53,12 +69,16 @@ function Poster({ id, imgUrl, title, rating, year, isMovie = false }) {
       <Container>
         <ImageContainer>
           <Image bgUrl={bgUrl} />
+          <Favorite
+            isFavorite={isFavorite}
+            onClick={(event) => handleFavoriteClick(event, id, isMovie)} 
+          />
           <Rating>
             <span role="img" aria-label="rating">
               ⭐
             </span>
             {rating}/10
-        </Rating>
+          </Rating>
         </ImageContainer>
         <Title>
           {title.length > 18 ? `${title.substring(0, 18)}...` : title}
@@ -74,7 +94,9 @@ Poster.propTypes = {
   imgUrl: PropTypes.string,
   title: PropTypes.string.isRequired,
   rating: PropTypes.number,
-  year: PropTypes.string
+  year: PropTypes.string,
+  isFavorite: PropTypes.bool,
+  handleFavoriteClick: PropTypes.func.isRequired
 }
 
 export default Poster;
