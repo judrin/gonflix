@@ -9,7 +9,7 @@ const Container = styled.div`
 `;
 
 const Image = styled.div`
-  background: url(${props => props.bgUrl}) center/cover no-repeat;
+  background: url(${props => props.bgUrl}) rgba(0, 0, 0, 0.68) center/cover no-repeat;
   height: 180px;
   border-radius: 3px;
   transition: opacity .15s linear;
