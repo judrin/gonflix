@@ -12,13 +12,13 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-function TVPresenter({ topRated, popular, airingToday, loading, error }) {
+function TVPresenter({ topRated, popular, airingToday, favorites, handleFavoriteClick, loading, error }) {
   return (
     <>
       <HeadTitle title="TV" />
       {!loading ? (
         <Container>
-          {topRated && topRated.length > 0 && (
+          {topRated.length > 0 && (
             <Section title="Top Rated Shows">
               {topRated.map(show => (
                 <Poster
@@ -28,11 +28,13 @@ function TVPresenter({ topRated, popular, airingToday, loading, error }) {
                   imgUrl={show.poster_path}
                   rating={show.vote_average}
                   year={show.first_air_date.substring(0, 4)}
+                  isFavorite={show.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                 />
               ))}
             </Section>
           )}
-          {popular && popular.length > 0 && (
+          {popular.length > 0 && (
             <Section title="Upcoming shows">
               {popular.map(show => (
                 <Poster
@@ -42,11 +44,13 @@ function TVPresenter({ topRated, popular, airingToday, loading, error }) {
                   imgUrl={show.poster_path}
                   rating={show.vote_average}
                   year={show.first_air_date.substring(0, 4)}
+                  isFavorite={show.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                 />
               ))}
             </Section>
           )}
-          {airingToday && airingToday.length > 0 && (
+          {airingToday.length > 0 && (
             <Section title="Airing Today">
               {airingToday.map(show => (
                 <Poster
@@ -56,6 +60,8 @@ function TVPresenter({ topRated, popular, airingToday, loading, error }) {
                   imgUrl={show.poster_path}
                   rating={show.vote_average}
                   year={show.first_air_date.substring(0, 4)}
+                  isFavorite={show.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                 />
               ))}
             </Section>
@@ -71,6 +77,8 @@ TVPresenter.prototype = {
   nowPlaying: PropTypes.array,
   popular: PropTypes.array,
   upcoming: PropTypes.array,
+  favorites: PropTypes.object,
+  handleFavoriteClick: PropTypes.func,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
 }

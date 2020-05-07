@@ -12,13 +12,13 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-function HomePresenter({ nowPlaying, popular, upcoming, loading, error }) {
+function HomePresenter({ nowPlaying, popular, upcoming, loading, favorites, handleFavoriteClick, error }) {
   return (
     <>
       <HeadTitle title="Movies" />
       {!loading ? (
         <Container>
-          {nowPlaying && nowPlaying.length > 0 && (
+          {nowPlaying.length > 0 && (
             <Section title="Now Playing">
               {nowPlaying.map(movie => (
                 <Poster
@@ -28,12 +28,14 @@ function HomePresenter({ nowPlaying, popular, upcoming, loading, error }) {
                   imgUrl={movie.poster_path}
                   rating={movie.vote_average}
                   year={movie.release_date && movie.release_date.substring(0, 4)}
+                  isFavorite={movie.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                   isMovie
                 />
               ))}
             </Section>
           )}
-          {upcoming && upcoming.length > 0 && (
+          {upcoming.length > 0 && (
             <Section title="Popular Movies">
               {upcoming.map(movie => (
                 <Poster
@@ -43,12 +45,14 @@ function HomePresenter({ nowPlaying, popular, upcoming, loading, error }) {
                   imgUrl={movie.poster_path}
                   rating={movie.vote_average}
                   year={movie.release_date && movie.release_date.substring(0, 4)}
+                  isFavorite={movie.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                   isMovie
                 />
               ))}
             </Section>
           )}
-          {popular && popular.length > 0 && (
+          {popular.length > 0 && (
             <Section title="Upcoming Movies">
               {popular.map(movie => (
                 <Poster
@@ -58,6 +62,8 @@ function HomePresenter({ nowPlaying, popular, upcoming, loading, error }) {
                   imgUrl={movie.poster_path}
                   rating={movie.vote_average}
                   year={movie.release_date && movie.release_date.substring(0, 4)}
+                  isFavorite={movie.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                   isMovie
                 />
               ))}
@@ -74,6 +80,8 @@ HomePresenter.prototype = {
   nowPlaying: PropTypes.array,
   popular: PropTypes.array,
   airngToday: PropTypes.array,
+  favorites: PropTypes.object,
+  handleFavoriteClick: PropTypes.func,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
 };

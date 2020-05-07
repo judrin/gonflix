@@ -7,14 +7,56 @@ class SearchContainer extends Component {
   state = {
     movieResults: null,
     tvResults: null,
+    movieFavorites: {},
+    tvFavorites: {},
     loading: false,
     error: null
   };
+
+  componentDidMount() {
+    let movieFavorites = localStorage.getItem('movieFavorites');
+    let tvFavorites = localStorage.getItem('tvFavorites');
+    movieFavorites = movieFavorites ? JSON.parse(movieFavorites) : {};
+    tvFavorites = tvFavorites ? JSON.parse(tvFavorites) : {};
+
+    this.setState({
+      movieFavorites,
+      tvFavorites,
+    });
+  }
 
   handleChange = (event) => {
     const term = event.target.value;
     this.debouncedSearchByTerm(term);
   }
+
+  handleFavoriteClick = (event, id, isMovie = true) => {
+    event.preventDefault();
+    const favorites = isMovie ? this.state.movieFavorites : this.state.tvFavorites;
+    let updated = false;
+
+    if (id in favorites) {
+      delete favorites[id];
+      updated = true;
+    } else {
+      const results = isMovie ? this.state.movieResults : this.state.tvResults;
+      const found = results.find(results => results.id === id);
+
+      if (found) {
+        favorites[id] = found;
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      this.setState({
+        favorites
+      });
+
+      localStorage.setItem(isMovie ? 'movieFavorites' : 'tvFavorites', JSON.stringify(favorites));
+    }
+  }
+
 
   updateTerm = (event) => {
     this.setState({
@@ -58,11 +100,18 @@ class SearchContainer extends Component {
 
   render() {
     const { movieResults, tvResults, searchTerm, loading, error } = this.state;
+    const favorites = {
+      ...this.state.movieFavorites, 
+      ...this.state.tvFavorites
+    }
+    
     return (
       <SearchPresenter
         movieResults={movieResults}
         tvResults={tvResults}
         searchTerm={searchTerm}
+        favorites={favorites}
+        handleFavoriteClick={this.handleFavoriteClick}
         loading={loading}
         error={error}
         handleChange={this.handleChange}

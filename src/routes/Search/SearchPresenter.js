@@ -27,6 +27,8 @@ function SearchPresenter({
   movieResults,
   tvResults,
   searchTerm,
+  favorites,
+  handleFavoriteClick,
   loading,
   error,
   handleChange
@@ -53,6 +55,8 @@ function SearchPresenter({
                   imgUrl={movie.poster_path}
                   rating={movie.vote_average}
                   year={movie.release_date && movie.release_date.substring(0, 4)}
+                  isFavorite={movie.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                   isMovie
                 />
               ))}
@@ -68,6 +72,8 @@ function SearchPresenter({
                   imgUrl={show.poster_path}
                   rating={show.vote_average}
                   year={show.first_air_date && show.first_air_date.substring(0, 4)}
+                  isFavorite={show.id in favorites}
+                  handleFavoriteClick={handleFavoriteClick}
                 />
               ))}
             </Section>
