@@ -74,8 +74,6 @@ class SearchContainer extends Component {
       return;
     }
 
-    console.log(term);
-
     this.setState({
       loading: true,
     });
