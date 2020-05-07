@@ -94,8 +94,9 @@ SearchPresenter.prototype = {
   searchTerm: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
-  handleSubmit: PropTypes.func.isRequired,
-  updateTerm: PropTypes.func.isRequired
+  handleFavoriteClick: PropTypes.func.isRequired,
+  handleChange:PropTypes.func.isRequired,
+  favorites: PropTypes.object
 };
 
 export default SearchPresenter;
