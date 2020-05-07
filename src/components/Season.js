@@ -23,7 +23,7 @@ const Container = styled.div`
 const Image = styled.div`
   flex: 0 0 125px;
   height: 180px;
-  background: url(${props => props.bgImage}) center/cover no-repeat;
+  background: url(${props => props.bgImage}) rgba(0, 0, 0, 0.68) center/cover no-repeat;
   border-radius: 3px;
 `
 
