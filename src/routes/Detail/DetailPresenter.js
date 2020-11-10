@@ -4,8 +4,11 @@ import styled from 'styled-components';
 import Loader from 'components/Loader';
 import HeadTitle from 'components/HeadTitle';
 import Message from 'components/Message';
-import HorizontalScrollbar from 'components/HorizontalScrollbar';
-import Season from 'components/Season';
+import { Link, Route, withRouter } from 'react-router-dom';
+import Tab from 'components/Tab';
+import VideoContainer from 'routes/Video';
+import SeasonsContainer from 'routes/Seasons';
+import ProductionContainer from 'routes/Production';
 
 const Container = styled.div`
   height: calc(100vh - 50px);
@@ -20,7 +23,7 @@ const Backdrop = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: url(${props => props.bgImage}) center/cover no-repeat;
+  background: url(${(props) => props.bgImage}) center/cover no-repeat;
   filter: blur(3px);
   opacity: 0.5;
 `;
@@ -37,9 +40,9 @@ const Content = styled.div`
 `;
 
 const Cover = styled.div`
-  width: 30%; 
+  width: 30%;
   height: 41vw;
-  background: url(${props => props.bgImage}) center/cover no-repeat;
+  background: url(${(props) => props.bgImage}) center/cover no-repeat;
   border-radius: 5px;
 
   @media (max-width: 767px) {
@@ -85,86 +88,72 @@ const Icon = styled.img`
   vertical-align: middle;
 `;
 
-const VideoContainer = styled.div`
+const Tabs = styled.div`
+  display: flex;
+  border-bottom: 1px solid rgba(53, 152, 219, 0.3);
   margin-top: 30px;
-
-  h4 {
-    display: inline-block;
-    font-size: 22px;
-    border-bottom: 3px solid #3498db;
-    padding: 5px;
-  }
 `;
 
-const Video = styled.div`
-  width: 320px;
-  margin-left: 20px;
-  display: inline-block;
+function DetailPresenter({ location, match, result, loading, error }) {
+  const { url, path } = match;
+  const { pathname } = location;
+  const isMovie = path.includes('/movie');
+  const videos = result.videos ? result.videos.results : [];
+  console.log(result);
+  const seasons = result.seasons ? result.seasons : [];
+  const releaseDate = result.release_date || result.first_air_date;
+  const runtime =
+    result.runtime || (result.episode_run_time && result.episode_run_time[0]);
 
-  :first-child {
-    margin-left: 0;
-  }
-
-  @media (max-width: 419px) {
-    width: 280px;
-
-    > iframe {
-      height: 158px;
-    }
-  }
-`
-
-const SeasonContainer = styled.div`
-  margin-top: 50px;
-`
-
-function DetailPresenter({ result, loading, error }) {
   const subDetails = [];
 
-  if (!loading) {
-    const releaseDate = result.release_date || result.first_air_date
-    const runtime = result.runtime || (result.episode_run_time && result.episode_run_time[0]);
-
-    if (releaseDate) subDetails.push(releaseDate.substring(0, 4));
-    if (runtime) subDetails.push(`${runtime} min`);
-    if (result.genres && result.genres.length) subDetails.push(result.genres.map(genre => genre.name).join(' / '))
-  }
+  if (releaseDate) subDetails.push(releaseDate.substring(0, 4));
+  if (runtime) subDetails.push(`${runtime} min`);
+  if (result.genres && result.genres.length)
+    subDetails.push(result.genres.map((genre) => genre.name).join(' / '));
 
   return (
     <>
-      <HeadTitle title={loading ? 'Loading' : result.original_title || result.original_name} />
+      <HeadTitle
+        title={
+          loading ? 'Loading' : result.original_title || result.original_name
+        }
+      />
       {!loading ? (
         <Container>
           {result.backdrop_path ? (
             <Backdrop
               bgImage={`https://image.tmdb.org/t/p/original${result.backdrop_path}`}
             />
-          ): null}
+          ) : null}
           <Content>
             <Cover
-              bgImage={result.poster_path
-                ? `https://image.tmdb.org/t/p/original${result.poster_path}`
-                : require('../../assets/not-available.png')}
+              bgImage={
+                result.poster_path
+                  ? `https://image.tmdb.org/t/p/original${result.poster_path}`
+                  : require('../../assets/not-available.png')
+              }
             />
             <Data>
-              <Title>
-                {result.original_title || result.original_name}
-              </Title>
+              <Title>{result.original_title || result.original_name}</Title>
               <ItemContainer>
-                {subDetails.reduce((acc, curr, index) => 
-                  [acc, <Divider key={`item-d-${index}`}>•</Divider>, <Item key={`detail-${index}`}>{curr}</Item>])
-                }
+                {subDetails.reduce((acc, curr, index) => [
+                  acc,
+                  <Divider key={`item-d-${index}`}>•</Divider>,
+                  <Item key={`detail-${index}`}>{curr}</Item>,
+                ])}
                 {result.imdb_id ? (
                   <>
                     <Divider>•</Divider>
                     <Item>
                       <a
                         href={`https://www.imdb.com/title/${result.imdb_id}`}
-                        target="_blank"
-                        rel="noopener noreferrer">
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
                         <Icon
                           src={require('../../assets/IMDb-logo.png')}
-                          alt="IMDb"
+                          alt='IMDb'
                         />
                       </a>
                     </Item>
@@ -172,46 +161,62 @@ function DetailPresenter({ result, loading, error }) {
                 ) : null}
               </ItemContainer>
               <Overview>{result.overview}</Overview>
-              <VideoContainer>
-                <h4>Trailer</h4>
-                <HorizontalScrollbar>
-                  {result.videos && result.videos.results.map(video => (
-                    <Video key={video.id}>
-                      <iframe
-                        src={`https://www.youtube.com/embed/${video.key}`}
-                        width="100%"
-                        height="180px"
-                        title={video.name}
-                      />
-                    </Video>
-                  ))}
-                </HorizontalScrollbar>
-              </VideoContainer>
-              <SeasonContainer>
-                {result.seasons && result.seasons.map(season => (
-                  <Season
-                    key={season.id}
-                    imgUrl={season.poster_path}
-                    name={season.name}
-                    year={season.air_date && season.air_date.substring(0, 4)} 
-                    epCount={season.episode_count} 
-                    overview={season.overview}
+              <Tabs>
+                <Link to={url}>
+                  <Tab name='Videos' active={pathname === url} />
+                </Link>
+                <Link to={`${url}/production`}>
+                  <Tab
+                    name='Production'
+                    active={pathname === `${url}/production`}
                   />
-                ))}
-              </SeasonContainer>
+                </Link>
+                {isMovie ? null : (
+                  <Link to={`${url}/seasons`}>
+                    <Tab
+                      name='Seasons'
+                      active={pathname === `${url}/seasons`}
+                    />
+                  </Link>
+                )}
+              </Tabs>
+              <Route
+                path={`${path}`}
+                exact
+                render={(props) => (
+                  <VideoContainer {...props} videos={videos} />
+                )}
+              />
+              <Route
+                path={`${path}/production`}
+                render={(props) => (
+                  <ProductionContainer
+                    {...props}
+                    companies={result.production_companies}
+                    countries={result.production_countries}
+                  />
+                )}
+              />
+              <Route
+                path={`${path}/seasons`}
+                render={(props) => (
+                  <SeasonsContainer {...props} seasons={seasons} />
+                )}
+              />
             </Data>
           </Content>
-          {error && <Message text={error} color="#e74c3c" />}
+          {error && <Message text={error} color='#e74c3c' />}
         </Container>
-      ) : <Loader />}
+      ) : (
+        <Loader />
+      )}
     </>
-  )
+  );
 }
 
 DetailPresenter.propTypes = {
   result: PropTypes.object,
-  loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
 };
 
-export default DetailPresenter;
+export default withRouter(DetailPresenter);
