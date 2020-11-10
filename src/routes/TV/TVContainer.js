@@ -1,89 +1,64 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import TVPresenter from './TVPresenter';
-import { tvApi } from 'api';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTVShows, updateFavorites } from 'redux/modules/tv';
 
-class TVContainer extends Component {
-  state = {
-    topRated: [],
-    popular: [],
-    airingToday: [],
-    favorites: {},
-    loading: true,
-    error: null
-  }
+function TVContainer() {
 
-  componentDidMount() {
-    let favorites = localStorage.getItem('tvFavorites');
-    favorites = favorites ? JSON.parse(favorites) : {};
+  const topRated = useSelector(state => state.topRated);
+  const popular = useSelector(state => state.popular);
+  const airingToday = useSelector(state => state.airingToday);
+  const favorites = useSelector(state => state.favorites);
+  const loading = useSelector(state => state.loading);
+  const error = useSelector(state => state.error);
 
-    Promise.all([
-      tvApi.topRated(),
-      tvApi.popular(),
-      tvApi.airingToday()
-    ])
-      .then(([topRatedResponse, popularResponse, airingTodayResponse]) => {
-        this.setState({
-          topRated: topRatedResponse.data.results,
-          popular: popularResponse.data.results,
-          airingToday: airingTodayResponse.data.results,
-          favorites,
-          loading: false
-        })
-      })
-      .catch(error => {
-        this.setState({
-          error: "Can't find TV information.",
-          loading: false
-        })
-      })
-  }
+  const dispatch = useDispatch();
 
-  handleFavoriteClick = (event, id) => {
+  useEffect(() => {
+    dispatch(fetchTVShows());
+  }, [])
+  
+
+  const handleFavoriteClick = (event, id) => {
     event.preventDefault();
-    const { favorites } = this.state;
+    const newFavorites = {...favorites};
     let updated = false;
 
-    if (id in favorites) {
-      delete favorites[id];
+    if (id in newFavorites) {
+      delete newFavorites[id];
       updated = true;
     } else {
       const shows = [
-        ...this.state.topRated,
-        ...this.state.popular,
-        ...this.state.airingToday
+        ...topRated,
+        ...popular,
+        ...airingToday
       ];
 
       const found = shows.find(show => show.id === id);
 
       if (found) {
-        favorites[id] = found;
+        newFavorites[id] = found;
         updated = true;
       }
     }
 
     if (updated) {
-      this.setState({
-        favorites
-      });
-
-      localStorage.setItem('tvFavorites', JSON.stringify(favorites));
+      dispatch(updateFavorites(newFavorites));
+      localStorage.setItem('tvFavorites', JSON.stringify(newFavorites));
     }
   }
 
-  render() {
-    const { topRated, popular, airingToday, favorites, loading, error } = this.state;
-    return (
-      <TVPresenter
-        topRated={topRated}
-        popular={popular}
-        airingToday={airingToday}
-        favorites={favorites}
-        handleFavoriteClick={this.handleFavoriteClick}
-        loading={loading}
-        error={error}
-      />
-    )
-  }
+  return (
+    <TVPresenter
+      topRated={topRated}
+      popular={popular}
+      airingToday={airingToday}
+      favorites={favorites}
+      handleFavoriteClick={handleFavoriteClick}
+      loading={loading}
+      error={error}
+    />
+  )
 }
 
 export default TVContainer;
