@@ -4,37 +4,31 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTVShows, updateFavorites } from 'redux/modules/tv';
 
 function TVContainer() {
-
-  const topRated = useSelector(state => state.topRated);
-  const popular = useSelector(state => state.popular);
-  const airingToday = useSelector(state => state.airingToday);
-  const favorites = useSelector(state => state.favorites);
-  const loading = useSelector(state => state.loading);
-  const error = useSelector(state => state.error);
+  const topRated = useSelector((state) => state.topRated);
+  const popular = useSelector((state) => state.popular);
+  const airingToday = useSelector((state) => state.airingToday);
+  const favorites = useSelector((state) => state.favorites);
+  const loading = useSelector((state) => state.loading);
+  const error = useSelector((state) => state.error);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchTVShows());
-  }, [])
-  
+  }, [dispatch]);
 
   const handleFavoriteClick = (event, id) => {
     event.preventDefault();
-    const newFavorites = {...favorites};
+    const newFavorites = { ...favorites };
     let updated = false;
 
     if (id in newFavorites) {
       delete newFavorites[id];
       updated = true;
     } else {
-      const shows = [
-        ...topRated,
-        ...popular,
-        ...airingToday
-      ];
+      const shows = [...topRated, ...popular, ...airingToday];
 
-      const found = shows.find(show => show.id === id);
+      const found = shows.find((show) => show.id === id);
 
       if (found) {
         newFavorites[id] = found;
@@ -46,7 +40,7 @@ function TVContainer() {
       dispatch(updateFavorites(newFavorites));
       localStorage.setItem('tvFavorites', JSON.stringify(newFavorites));
     }
-  }
+  };
 
   return (
     <TVPresenter
@@ -58,7 +52,7 @@ function TVContainer() {
       loading={loading}
       error={error}
     />
-  )
+  );
 }
 
 export default TVContainer;
